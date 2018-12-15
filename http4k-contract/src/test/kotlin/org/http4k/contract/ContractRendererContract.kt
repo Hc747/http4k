@@ -5,6 +5,7 @@ import com.natpryce.hamkrest.equalTo
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.BasicAuthSecurity
 import org.http4k.contract.security.BearerAuthSecurity
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.Body
 import org.http4k.core.ContentType.Companion.APPLICATION_FORM_URLENCODED
 import org.http4k.core.ContentType.Companion.APPLICATION_JSON
@@ -12,7 +13,7 @@ import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.ContentType.Companion.OCTET_STREAM
 import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.Credentials
-import org.http4k.core.Method
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -33,7 +34,7 @@ import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.Path
 import org.http4k.lens.Query
-import org.http4k.lens.Validator
+import org.http4k.lens.Validator.Strict
 import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.string
@@ -69,30 +70,30 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
         val router = "/basepath" bind contract {
             renderer = rendererToUse
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
-            routes += "/nometa" bindContract GET to { Response(OK) }
+            routes += "/nometa" bindContract GET to HttpHandler { Response(OK) }
             routes += "/descriptions" meta {
                 summary = "endpoint"
                 description = "some rambling description of what this thing actually does"
                 operationId = "echoMessage"
                 tags += Tag("tag3")
                 tags += Tag("tag1")
-            } bindContract GET to { Response(OK) }
-            routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age") bindContract POST to { a, _, _ -> { Response(OK).body(a) } }
+            } bindContract GET to HttpHandler { Response(OK) }
+            routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age") bindContract POST to { a, _, _ -> HttpHandler { Response(OK).body(a) } }
             routes += "/queries" meta {
                 queries += Query.boolean().required("b", "booleanQuery")
                 queries += Query.string().optional("s", "stringQuery")
                 queries += Query.int().optional("i", "intQuery")
                 queries += json.lens(Query).optional("j", "jsonQuery")
-            } bindContract POST to { Response(OK).body("hello") }
+            } bindContract POST to HttpHandler { Response(OK).body("hello") }
             routes += "/headers" meta {
                 headers += Header.boolean().required("b", "booleanHeader")
                 headers += Header.string().optional("s", "stringHeader")
                 headers += Header.int().optional("i", "intHeader")
                 headers += json.lens(Header).optional("j", "jsonHeader")
-            } bindContract POST to { Response(OK).body("hello") }
+            } bindContract POST to HttpHandler { Response(OK).body("hello") }
             routes += "/body_string" meta {
                 receiving(Body.string(TEXT_PLAIN).toLens())
-            } bindContract POST to { Response(OK) }
+            } bindContract POST to HttpHandler { Response(OK) }
             routes += "/body_json_noschema" meta {
                 receiving(json.body("json").toLens())
             } bindContract POST to { Response(OK) }
@@ -101,7 +102,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                     val obj = obj("aNullField" to nullNode(), "aNumberField" to number(123))
                     Response(OK).with(body("json").toLens() of obj)
                 })
-            } bindContract POST to { Response(OK) }
+            } bindContract POST to HttpHandler { Response(OK) }
             routes += "/body_json_schema" meta {
                 receiving(json.body("json").toLens() to json {
                     obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
@@ -111,12 +112,12 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                 receiving(json.body("json").toLens() to json {
                     array(obj("aNumberField" to number(123)))
                 })
-            } bindContract POST to { Response(OK) }
+            } bindContract POST to HttpHandler { Response(OK) }
             routes += "/extra_security" meta {
                 security = BasicAuthSecurity("realm", Credentials("user", "password"))
             } bindContract POST to { Response(OK) }
             routes += "/body_form" meta {
-                receiving(Body.webForm(Validator.Strict,
+                receiving(Body.webForm(Strict,
                     FormField.boolean().required("b", "booleanField"),
                     FormField.int().optional("i", "intField"),
                     FormField.string().optional("s", "stringField"),
@@ -128,10 +129,10 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                 produces += APPLICATION_XML
                 consumes += OCTET_STREAM
                 consumes += APPLICATION_FORM_URLENCODED
-            } bindContract GET to { Response(OK) }
+            } bindContract GET to HttpHandler { Response(OK) }
             routes += "/returning" meta {
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of json { obj("aString" to string("a message of some kind")) }))
-            } bindContract POST to { Response(OK) }
+            } bindContract POST to HttpHandler { Response(OK) }
             routes += "/body_auto_schema" meta {
                 receiving(Body.auto<ArbObject2>().toLens() to ArbObject2(
                     "s",
