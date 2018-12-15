@@ -14,7 +14,7 @@ class OAuthCallback(
     private val accessTokenFetcher: AccessTokenFetcher
 ) : HttpHandler {
 
-    override fun invoke(request: Request): Response {
+    override suspend fun invoke(request: Request): Response {
         val state = request.query("state")?.toParameters() ?: emptyList()
         val crsfInState = state.find { it.first == "csrf" }?.second?.let(::CrossSiteRequestForgeryToken)
         return request.query("code")?.let { code ->

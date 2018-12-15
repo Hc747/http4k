@@ -18,7 +18,7 @@ class ApiKeySecurityTest {
     @Test
     fun `valid API key is granted access and result carried through`() {
         val param = Query.int().required("name")
-        val next: HttpHandler = { Response(OK).body("hello") }
+        val next = HttpHandler { Response(OK).body("hello") }
 
         val response = ApiKeySecurity(param, { true }).filter(next)(Request(Method.GET, "?name=1"))
 
@@ -29,7 +29,7 @@ class ApiKeySecurityTest {
     @Test
     fun `OPTIONS request is granted access even with no API key if toggled off`() {
         val param = Query.int().required("name")
-        val next: HttpHandler = { Response(OK).body("hello") }
+        val next = HttpHandler { Response(OK).body("hello") }
 
         val response = ApiKeySecurity(param, { true }, false).filter(next)(Request(Method.OPTIONS, "/"))
 
@@ -40,7 +40,7 @@ class ApiKeySecurityTest {
     @Test
     fun `missing API key is unauthorized`() {
         val param = Query.int().required("name")
-        val next: HttpHandler = { Response(OK).body("hello") }
+        val next = HttpHandler { Response(OK).body("hello") }
 
         val response = ApiKeySecurity(param, { true }).filter(next)(Request(Method.GET, ""))
 
@@ -50,7 +50,7 @@ class ApiKeySecurityTest {
     @Test
     fun `bad API key is unauthorized`() {
         val param = Query.int().required("name")
-        val next: HttpHandler = { Response(OK).body("hello") }
+        val next = HttpHandler { Response(OK).body("hello") }
 
         val response = ApiKeySecurity(param, { true }).filter(next)(Request(Method.GET, "?name=asdasd"))
 
@@ -60,7 +60,7 @@ class ApiKeySecurityTest {
     @Test
     fun `unknown API key is unauthorized`() {
         val param = Query.int().required("name")
-        val next: HttpHandler = { Response(OK).body("hello") }
+        val next = HttpHandler { Response(OK).body("hello") }
 
         val response = ApiKeySecurity(param, { false }).filter(next)(Request(Method.GET, "?name=1"))
 

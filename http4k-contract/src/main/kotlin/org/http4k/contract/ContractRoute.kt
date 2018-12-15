@@ -26,14 +26,14 @@ class ContractRoute internal constructor(val method: Method,
     internal fun toRouter(contractRoot: PathSegments) = object : Router {
         override fun toString(): String = "${method.name}: ${spec.describe(contractRoot)}"
 
-        override fun match(request: Request): HttpHandler? =
+        override suspend fun match(request: Request): HttpHandler? =
             if ((request.method == OPTIONS || request.method == method) && request.pathSegments().startsWith(spec.pathFn(contractRoot))) {
                 try {
                     request.without(spec.pathFn(contractRoot))
                         .extract(spec.pathLenses.toList())
                         ?.let {
                             if (request.method == OPTIONS) {
-                                { Response(OK) }
+                                HttpHandler { Response(OK) }
                             } else toHandler(it)
                         }
                 } catch (e: LensFailure) {

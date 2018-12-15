@@ -39,11 +39,11 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     private val notFound = preSecurityFilter.then(security.filter).then(postSecurityFilter).then { renderer.notFound() }
 
-    private val handler: HttpHandler = { (match(it) ?: notFound).invoke(it) }
+    private val handler = HttpHandler { (match(it) ?: notFound).invoke(it) }
 
-    override fun invoke(request: Request): Response = handler(request)
+    override suspend fun invoke(request: Request): Response = handler(request)
 
-    private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta()) bindContract GET to { renderer.description(contractRoot, security, routes) }
+    private val descriptionRoute = ContractRouteSpec0({ PathSegments("$it$descriptionPath") }, RouteMeta()) bindContract GET to HttpHandler { renderer.description(contractRoot, security, routes) }
 
     private val catchLensFailure = CatchLensFailure { renderer.badRequest(it.failures) }
 
@@ -58,7 +58,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
     override fun toString() = contractRoot.toString() + "\n" + routes.joinToString("\n") { it.toString() }
 
-    override fun match(request: Request): HttpHandler? {
+    override suspend fun match(request: Request): HttpHandler? {
         val noMatch: HttpHandler? = null
 
         return if (request.isIn(contractRoot)) {
@@ -71,7 +71,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
     private fun identify(route: ContractRoute) =
         route.describeFor(contractRoot).let { routeIdentity ->
             Filter { next ->
-                {
+                HttpHandler {
                     val xUriTemplate = UriTemplate.from(if (routeIdentity.isEmpty()) "/" else routeIdentity)
                     RoutedResponse(next(RoutedRequest(it, xUriTemplate)), xUriTemplate)
                 }
