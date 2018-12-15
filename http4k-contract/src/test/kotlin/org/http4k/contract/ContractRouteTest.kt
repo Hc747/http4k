@@ -69,7 +69,7 @@ class ContractRouteTest {
 
     @Test
     fun `0 parts - matches route`() = runBlocking {
-        val route = "/" bindContract GET to HttpHandler { Response(OK) }
+        val route = "/" bindContract GET to2 { Response(OK) }
         val router = route.toRouter(Root)
         assertThat(router.match(Request(GET, "/")), present())
         assertThat(router.match(Request(POST, "/")), absent())
