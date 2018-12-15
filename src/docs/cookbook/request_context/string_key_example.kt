@@ -10,11 +10,11 @@ import org.http4k.core.Status
 import org.http4k.core.then
 import org.http4k.filter.ServerFilters
 
-fun main() {
+suspend fun main() {
     data class SharedState(val message: String)
 
     fun AddState(contexts: RequestContexts) = Filter { next ->
-        {
+        HttpHandler {
             contexts[it]["myKey"] = SharedState("hello there")
             next(it)
         }

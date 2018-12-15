@@ -35,7 +35,7 @@ import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.time.Clock
 
-fun main() {
+suspend fun main() {
 
     fun add(value1: Int, value2: Int) = HttpHandler {
         Response(OK).with(
@@ -65,7 +65,7 @@ fun main() {
             summary = "add"
             description = "Adds 2 numbers together"
             returning(OK to "The result")
-        } bindContract GET to { Response(OK).body("pong") }
+        } bindContract GET to HttpHandler { Response(OK).body("pong") }
 
         routes += "/add" / Path.int().of("value1") / Path.int().of("value2") meta {
             summary = "add"
