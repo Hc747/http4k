@@ -34,7 +34,7 @@ import org.http4k.lens.ParamMeta.NumberParam
 import org.http4k.lens.ParamMeta.StringParam
 import org.http4k.lens.Path
 import org.http4k.lens.Query
-import org.http4k.lens.Validator.Strict
+import org.http4k.lens.Validator
 import org.http4k.lens.boolean
 import org.http4k.lens.int
 import org.http4k.lens.string
@@ -78,7 +78,8 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                 tags += Tag("tag3")
                 tags += Tag("tag1")
             } bindContract GET to HttpHandler { Response(OK) }
-            routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age") bindContract POST to { a, _, _ -> HttpHandler { Response(OK).body(a) } }
+            routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age")
+                bindContract POST to { a, _, _ -> HttpHandler { Response(OK).body(a) } }
             routes += "/queries" meta {
                 queries += Query.boolean().required("b", "booleanQuery")
                 queries += Query.string().optional("s", "stringQuery")

@@ -40,7 +40,7 @@ class ChaosEngineTest {
 
     @Test
     fun `can convert a normal app to be chaotic`() = runBlocking {
-        val app = routes("/" bind GET to HttpHandler { Response(OK) })
+        val app = routes("/" bind GET to { Response(OK) })
 
         val appWithChaos = app.withChaosEngine(ReturnStatus(NOT_FOUND).appliedWhen(Always()))
 
@@ -72,7 +72,7 @@ class ChaosEngineTest {
 
     @Test
     fun `can configure chaos controls`() = runBlocking {
-        val app = routes("/" bind GET to HttpHandler { Response(OK) })
+        val app = routes("/" bind GET to { Response(OK) })
 
         val appWithChaos = app.withChaosEngine(
                 Wait,
@@ -86,7 +86,7 @@ class ChaosEngineTest {
 
     @Test
     fun `combines with other route blocks`() = runBlocking {
-        val app = routes("/{bib}/{bar}" bind GET to HttpHandler { Response(I_M_A_TEAPOT).body(it.path("bib")!! + it.path("bar")!!) })
+        val app = routes("/{bib}/{bar}" bind GET to { Response(I_M_A_TEAPOT).body(it.path("bib")!! + it.path("bar")!!) })
 
         val appWithChaos = app.withChaosEngine(
                 Wait,
