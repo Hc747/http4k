@@ -45,7 +45,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     private val requiredBody = Body.auto<ARandomObject>().toLens()
 
     val contractRoutes = listOf(
-        validPath bindContract GET to2 { Response(OK).with(header of header(it)) },
+        validPath bindContract GET to HttpHandler { Response(OK).with(header of header(it)) },
         "/bad-request" bindContract GET to { requiredQuery(it); Response(OK) },
         "/bad-request-query-via-meta" meta { queries += requiredQuery } bindContract GET to { Response(OK) },
         "/bad-request-body" bindContract GET to { requiredBody(it); Response(OK) },
@@ -78,7 +78,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
 
         val root = "/root" bind contract {
             descriptionPath = "/docs"
-            routes += "/" bindContract GET to2 { Response(OK).with(header of header(it)) }
+            routes += "/" bindContract GET to HttpHandler { Response(OK).with(header of header(it)) }
         }
         val withRoute = filter.then(root)
 
@@ -104,7 +104,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     fun `OPTIONS traffic goes to the path specified but is intercepted by the default response if the route does NOT response to OPTIONS`() = runBlocking {
         val root = routes(
             "/root/bar" bind contract {
-                routes += "/foo/bar" bindContract GET to2 { Response(NOT_IMPLEMENTED) }
+                routes += "/foo/bar" bindContract GET to HttpHandler { Response(NOT_IMPLEMENTED) }
             }
         )
         val response = root(Request(OPTIONS, "/root/bar/foo/bar"))
@@ -140,7 +140,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     fun `applies security and responds with a 401 to unauthorized requests`() = runBlocking {
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
-            routes += "/bob" bindContract GET to2 { Response(OK) }
+            routes += "/bob" bindContract GET to HttpHandler { Response(OK) }
         }
         val response = root(Request(GET, "/root/bob?key=sue"))
         assertThat(response.status, equalTo(UNAUTHORIZED))
@@ -170,7 +170,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     fun `pre-security filter is applied before security`() = runBlocking {
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
-            routes += "/bob" bindContract GET to2 { Response(OK) }
+            routes += "/bob" bindContract GET to HttpHandler { Response(OK) }
         }.withFilter(Filter { next ->
             HttpHandler {
                 next(it.query("key", "bob"))
@@ -184,7 +184,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     fun `post-security filter is applied after security`() = runBlocking {
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
-            routes += "/bob" bindContract GET to2 { Response(OK).body(it.body) }
+            routes += "/bob" bindContract GET to HttpHandler { Response(OK).body(it.body) }
         }.withPostSecurityFilter(Filter { next ->
             HttpHandler {
                 next(it.body("body"))
@@ -198,7 +198,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     fun `applies security and responds with a 200 to authorized requests`() = runBlocking {
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
-            routes += "/bob" bindContract GET to2 { Response(OK) }
+            routes += "/bob" bindContract GET to HttpHandler { Response(OK) }
         }
 
         val response = root(Request(GET, "/root/bob?key=bob"))

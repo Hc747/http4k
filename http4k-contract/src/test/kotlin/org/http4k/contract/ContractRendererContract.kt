@@ -70,14 +70,14 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
         val router = "/basepath" bind contract {
             renderer = rendererToUse
             security = ApiKeySecurity(Query.required("the_api_key"), { true })
-            routes += "/nometa" bindContract GET to2 { Response(OK) }
+            routes += "/nometa" bindContract GET to HttpHandler { Response(OK) }
             routes += "/descriptions" meta {
                 summary = "endpoint"
                 description = "some rambling description of what this thing actually does"
                 operationId = "echoMessage"
                 tags += Tag("tag3")
                 tags += Tag("tag1")
-            } bindContract GET to2 { Response(OK) }
+            } bindContract GET to HttpHandler { Response(OK) }
             routes += "/paths" / Path.of("firstName") / "bertrand" / Path.boolean().of("age")
                 bindContract POST to { a, _, _ -> HttpHandler { Response(OK).body(a) } }
             routes += "/queries" meta {
@@ -85,16 +85,16 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                 queries += Query.string().optional("s", "stringQuery")
                 queries += Query.int().optional("i", "intQuery")
                 queries += json.lens(Query).optional("j", "jsonQuery")
-            } bindContract POST to2 { Response(OK).body("hello") }
+            } bindContract POST to HttpHandler { Response(OK).body("hello") }
             routes += "/headers" meta {
                 headers += Header.boolean().required("b", "booleanHeader")
                 headers += Header.string().optional("s", "stringHeader")
                 headers += Header.int().optional("i", "intHeader")
                 headers += json.lens(Header).optional("j", "jsonHeader")
-            } bindContract POST to2 { Response(OK).body("hello") }
+            } bindContract POST to HttpHandler { Response(OK).body("hello") }
             routes += "/body_string" meta {
                 receiving(Body.string(TEXT_PLAIN).toLens())
-            } bindContract POST to2 { Response(OK) }
+            } bindContract POST to HttpHandler { Response(OK) }
             routes += "/body_json_noschema" meta {
                 receiving(json.body("json").toLens())
             } bindContract POST to { Response(OK) }
@@ -103,7 +103,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                     val obj = obj("aNullField" to nullNode(), "aNumberField" to number(123))
                     Response(OK).with(body("json").toLens() of obj)
                 })
-            } bindContract POST to2 { Response(OK) }
+            } bindContract POST to HttpHandler { Response(OK) }
             routes += "/body_json_schema" meta {
                 receiving(json.body("json").toLens() to json {
                     obj("anAnotherObject" to obj("aNullField" to nullNode(), "aNumberField" to number(123)))
@@ -113,7 +113,7 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                 receiving(json.body("json").toLens() to json {
                     array(obj("aNumberField" to number(123)))
                 })
-            } bindContract POST to2 { r: Request -> Response(OK) }
+            } bindContract POST to HttpHandler { r: Request -> Response(OK) }
             routes += "/extra_security" meta {
                 security = BasicAuthSecurity("realm", Credentials("user", "password"))
             } bindContract POST to { Response(OK) }
@@ -130,10 +130,10 @@ abstract class ContractRendererContract<NODE>(private val json: Json<NODE>, priv
                 produces += APPLICATION_XML
                 consumes += OCTET_STREAM
                 consumes += APPLICATION_FORM_URLENCODED
-            } bindContract GET to2 { Response(OK) }
+            } bindContract GET to HttpHandler { Response(OK) }
             routes += "/returning" meta {
                 returning("no way jose" to Response(FORBIDDEN).with(customBody of json { obj("aString" to string("a message of some kind")) }))
-            } bindContract POST to2 { Response(OK) }
+            } bindContract POST to HttpHandler { Response(OK) }
             routes += "/body_auto_schema" meta {
                 receiving(Body.auto<ArbObject2>().toLens() to ArbObject2(
                     "s",

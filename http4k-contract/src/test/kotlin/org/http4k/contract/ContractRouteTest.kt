@@ -22,6 +22,38 @@ import org.junit.jupiter.api.Test
 class ContractRouteTest {
 
     @Test
+    fun `validates contract - success`() = runBlocking {
+        val headerLens = Header.required("header")
+        val queryLens = Query.required("query")
+        val bodyLens = Body.string(TEXT_PLAIN).toLens()
+        val route = "/" meta {
+            headers += headerLens
+            queries += queryLens
+            receiving(bodyLens)
+        } bindContract GET to HttpHandler { Response(OK) }
+
+        assertThat(route.toRouter(Root).match(Request(GET, "").with(headerLens of "value", queryLens of "value", bodyLens of "hello")), present())
+    }
+
+    @Test
+    fun `validates contract - failure`() = runBlocking {
+        val headerLens = Header.required("header")
+        val queryLens = Query.required("query")
+        val bodyLens = Body.string(TEXT_PLAIN).toLens()
+        val route = "/" meta {
+            headers += headerLens
+            queries += queryLens
+            receiving(bodyLens)
+        } bindContract GET to HttpHandler { Response(OK) }
+
+        val invalidRequest = Request(GET, "").with(headerLens of "value", bodyLens of "hello")
+        val actual = route.toRouter(Root).match(invalidRequest)
+        assertThat(actual, present())
+        assertThat({ runBlocking { actual?.invoke(invalidRequest) } },
+                throws(lensFailureWith<Request>(Missing(queryLens.meta), overallType = Failure.Type.Missing)))
+    }
+
+    @Test
     fun `can build a request from a route`() = runBlocking {
         val path1 = Path.int().of("sue")
         val path2 = Path.string().of("bob")
@@ -69,7 +101,7 @@ class ContractRouteTest {
 
     @Test
     fun `0 parts - matches route`() = runBlocking {
-        val route = "/" bindContract GET to2 { Response(OK) }
+        val route = "/" bindContract GET to HttpHandler { Response(OK) }
         val router = route.toRouter(Root)
         assertThat(router.match(Request(GET, "/")), present())
         assertThat(router.match(Request(POST, "/")), absent())
