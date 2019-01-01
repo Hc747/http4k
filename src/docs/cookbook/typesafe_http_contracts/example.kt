@@ -78,7 +78,7 @@ suspend fun main() {
             summary = "divide"
             description = "Divides 2 numbers"
             returning(OK to "The result")
-        } bindContract GET to { first, second, _ -> { Response(OK).body((first / second).toString()) } }
+        } bindContract GET to { first, second, _ -> HttpHandler { Response(OK).body((first / second).toString()) } }
 
         routes += "/echo" / Path.of("name") meta {
             summary = "echo"
