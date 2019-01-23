@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test
 class FiltersTest {
 
     @Test
-    fun `process files filter and convert form from multipart webform`() {
+    fun `process files filter and convert form from multipart webform`() = runBlocking {
         val form = MultipartFormBody("bob") + ("field" to "bar") +
             ("file" to FormFile("foo.txt", ContentType.TEXT_PLAIN, "content".byteInputStream())) +
             ("field" to "bar")

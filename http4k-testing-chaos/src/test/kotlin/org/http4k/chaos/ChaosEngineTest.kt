@@ -4,10 +4,14 @@ import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 
+<<<<<<< HEAD
 import org.http4k.chaos.ChaosBehaviours.ReturnStatus
 import com.natpryce.hamkrest.assertion.assertThat
 
 import com.natpryce.hamkrest.should.shouldMatch
+=======
+import com.natpryce.hamkrest.assertion.assertThat
+>>>>>>> replace shouldMatch with assertThat
 import kotlinx.coroutines.runBlocking
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.chaos.ChaosTriggers.Always
@@ -67,6 +71,10 @@ class ChaosEngineTest {
         assertThat(appWithChaos(Request(POST, "/chaos/deactivate")), hasStatus(OK).and(hasBody(noChaos)))
         assertThat(appWithChaos(Request(GET, "/chaos/status")), hasBody(noChaos))
         assertThat(appWithChaos(Request(POST, "/chaos/activate")), hasStatus(OK).and(hasBody(customChaos)))
+<<<<<<< HEAD
+=======
+        Unit
+>>>>>>> replace shouldMatch with assertThat
     }
 
     @Test
@@ -81,6 +89,10 @@ class ChaosEngineTest {
 
         assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(UNAUTHORIZED))
         assertThat(appWithChaos(Request(GET, "/context/status").header("secret", "whatever")), hasStatus(OK))
+<<<<<<< HEAD
+=======
+        Unit
+>>>>>>> replace shouldMatch with assertThat
     }
 
     @Test
@@ -115,5 +127,9 @@ class ChaosEngineTest {
         val routed = appWithChaos(Request(GET, "/foo/bob"))
         assertThat(routed, hasStatus(I_M_A_TEAPOT))
         assertThat((routed as RoutedResponse).xUriTemplate, equalTo(UriTemplate.from("{path:.*}")))
+<<<<<<< HEAD
+=======
+        Unit
+>>>>>>> replace shouldMatch with assertThat
     }
 }

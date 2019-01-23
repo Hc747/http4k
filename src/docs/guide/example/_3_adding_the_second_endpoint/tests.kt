@@ -16,8 +16,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-
 object Matchers {
+
     fun Response.answerShouldBe(expected: Int) {
         assertThat(this, hasStatus(OK).and(hasBody(expected.toString())))
     }
@@ -28,12 +28,12 @@ class EndToEndTest {
     private val server = MyMathServer(0)
 
     @BeforeEach
-    fun setup() {
+    fun setup(): Unit {
         server.start()
     }
 
     @AfterEach
-    fun teardown() {
+    fun teardown(): Unit {
         server.stop()
     }
 
@@ -61,6 +61,7 @@ class AddFunctionalTest {
     @Test
     fun `bad request when some values are not numbers`() = runBlocking {
         assertThat(client(Request(GET, "/add?value=1&value=notANumber")), hasStatus(BAD_REQUEST))
+        Unit
     }
 }
 
@@ -80,5 +81,6 @@ class MultiplyFunctionalTest {
     @Test
     fun `bad request when some values are not numbers`() = runBlocking {
         assertThat(client(Request(GET, "/multiply?value=1&value=notANumber")), hasStatus(BAD_REQUEST))
+        Unit
     }
 }
