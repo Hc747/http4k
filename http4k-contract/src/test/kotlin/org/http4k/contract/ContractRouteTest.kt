@@ -6,8 +6,6 @@ import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.present
 import com.natpryce.hamkrest.throws
 import kotlinx.coroutines.runBlocking
-import org.http4k.core.Body
-import org.http4k.core.ContentType.Companion.TEXT_PLAIN
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -16,49 +14,13 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.OK
 import org.http4k.core.Uri
 import org.http4k.core.with
-import org.http4k.lens.Failure
-import org.http4k.lens.Header
-import org.http4k.lens.Missing
 import org.http4k.lens.Path
 import org.http4k.lens.Query
 import org.http4k.lens.int
-import org.http4k.lens.lensFailureWith
 import org.http4k.lens.string
 import org.junit.jupiter.api.Test
 
 class ContractRouteTest {
-
-    @Test
-    fun `validates contract - success`() = runBlocking {
-        val headerLens = Header.required("header")
-        val queryLens = Query.required("query")
-        val bodyLens = Body.string(TEXT_PLAIN).toLens()
-        val route = "/" meta {
-            headers += headerLens
-            queries += queryLens
-            receiving(bodyLens)
-        } bindContract GET to { Response(OK) }
-
-        assertThat(route.toRouter(Root).match(Request(GET, "").with(headerLens of "value", queryLens of "value", bodyLens of "hello")), present())
-    }
-
-    @Test
-    fun `validates contract - failure`() = runBlocking {
-        val headerLens = Header.required("header")
-        val queryLens = Query.required("query")
-        val bodyLens = Body.string(TEXT_PLAIN).toLens()
-        val route = "/" meta {
-            headers += headerLens
-            queries += queryLens
-            receiving(bodyLens)
-        } bindContract GET to { Response(OK) }
-
-        val invalidRequest = Request(GET, "").with(headerLens of "value", bodyLens of "hello")
-        val actual = route.toRouter(Root).match(invalidRequest)
-        assertThat(actual, present())
-        assertThat({ runBlocking { actual?.invoke(invalidRequest) } },
-                throws(lensFailureWith<Request>(Missing(queryLens.meta), overallType = Failure.Type.Missing)))
-    }
 
     @Test
     fun `can build a request from a route`() = runBlocking {
