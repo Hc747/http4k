@@ -60,7 +60,7 @@ class ResponseFiltersTest {
     }
 
     @Test
-    fun `prioritises routed response when reporting a transaction`() {
+    fun `prioritises routed response when reporting a transaction`() = runBlocking {
         var called = false
         val request = RoutedRequest(Request(GET, ""), UriTemplate.from("foo"))
         val response = RoutedResponse(Response(OK), UriTemplate.from("bar"))

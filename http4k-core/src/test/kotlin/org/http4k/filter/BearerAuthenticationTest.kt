@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test
 class BearerAuthenticationTest {
 
     @Test
-    fun wrong_token_type() {
+    fun wrong_token_type() = runBlocking {
         val handler = ServerFilters.BearerAuth("Basic dXNlcjpwYXNzd29yZA==").then { Response(OK) }
         val response = ClientFilters.BasicAuth("user", "password")
             .then(handler)(Request(GET, "/"))
@@ -41,7 +41,7 @@ class BearerAuthenticationTest {
     }
 
     @Test
-    fun fails_to_authentic_with_non_bearer_token() {
+    fun fails_to_authentic_with_non_bearer_token() = runBlocking {
         val handler = ServerFilters.BearerAuth("Basic YmFkZ2VyOm1vbmtleQ==").then { Response(OK) }
         val response = ClientFilters.BasicAuth("badger", "monkey").then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(UNAUTHORIZED))

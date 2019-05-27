@@ -19,7 +19,7 @@ internal suspend fun assertBehaviour(json: String, description: String, matcher:
 }
 
 @JvmName("assertBehaviourRequest")
-internal fun assertBehaviour(json: String, description: String, matcher: Matcher<Request>) {
+internal suspend fun assertBehaviour(json: String, description: String, matcher: Matcher<Request>) {
     json.createBehaviourWith(description).then {
         assertThat(it, matcher)
         Response(OK)

@@ -144,7 +144,7 @@ class SnipBodyBehaviourTest : ChaosBehaviourContract() {
     private val description = "SnipBody"
 
     @Test
-    fun `should return snipped body`() {
+    fun `should return snipped body`() = runBlocking {
         val snipBody = ChaosBehaviours.SnipBody(Random(1)) { 3 }
         assertThat(snipBody.toString(), equalTo(description))
 
@@ -152,7 +152,7 @@ class SnipBodyBehaviourTest : ChaosBehaviourContract() {
     }
 
     @Test
-    override fun `deserialises from JSON`() {
+    override fun `deserialises from JSON`() = runBlocking {
         assertBehaviour("""{"type":"snip"}""",
             description,
             hasStatus(OK).and(hasHeader("x-http4k-chaos", matches("""Snip body \(\db\)""".toRegex()))))
@@ -163,7 +163,7 @@ class SnipRequestBodyBehaviourTest : ChaosBehaviourContract() {
     private val description = "SnipRequestBody"
 
     @Test
-    fun `should snip request body`() {
+    fun `should snip request body`() = runBlocking {
         val snipBody = ChaosBehaviours.SnipRequestBody(Random(1)) { 3 }
         assertThat(snipBody.toString(), equalTo(description))
 
@@ -174,7 +174,7 @@ class SnipRequestBodyBehaviourTest : ChaosBehaviourContract() {
     }
 
     @Test
-    override fun `deserialises from JSON`() {
+    override fun `deserialises from JSON`() = runBlocking {
         assertBehaviour("""{"type":"sniprequest"}""",
             description,
             hasMethod(GET).and(hasHeader("x-http4k-chaos", matches("""Snip request body \(\db\)""".toRegex()))))

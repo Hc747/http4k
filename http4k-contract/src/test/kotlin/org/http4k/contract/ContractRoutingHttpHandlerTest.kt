@@ -3,6 +3,7 @@ package org.http4k.contract
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
+import kotlinx.coroutines.runBlocking
 import org.http4k.contract.PreFlightExtraction.Companion.IgnoreBody
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.BasicAuthSecurity
@@ -147,7 +148,7 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     }
 
     @Test
-    fun `combine security for one endpoint only`() {
+    fun `combine security for one endpoint only`() = runBlocking {
         val credentials = Credentials("bill", "password")
         val root = "/root" bind contract {
             security = ApiKeySecurity(Query.required("key"), { it == "bob" })
@@ -245,21 +246,21 @@ abstract class ContractRoutingHttpHandlerContract : RoutingHttpHandlerContract()
     }
 
     @Test
-    fun `handles bad request via contract violation - parameter`() {
+    fun `handles bad request via contract violation - parameter`() = runBlocking {
         assertThat(handler(Request(GET, "/bad-request-query-via-meta")),
             hasStatus(BAD_REQUEST) and
                 hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"foo","type":"query","datatype":"integer","required":true,"reason":"Missing"}]}"""))
     }
 
     @Test
-    fun `handles bad request via contract-violation - body`() {
+    fun `handles bad request via contract-violation - body`() = runBlocking {
         assertThat(handler(Request(GET, "/bad-request-body-via-meta")),
             hasStatus(BAD_REQUEST) and
                 hasBody("""{"message":"Missing/invalid parameters","params":[{"name":"body","type":"body","datatype":"object","required":true,"reason":"Invalid"}]}"""))
     }
 
     @Test
-    fun `can disable body checking by overriding pre-request-extraction`() {
+    fun `can disable body checking by overriding pre-request-extraction`() = runBlocking {
         assertThat(handler(Request(GET, "/bad-request-body-override-precheck")), hasStatus(OK))
     }
 }

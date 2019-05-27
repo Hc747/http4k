@@ -25,7 +25,7 @@ class GenerateAccessToken(
     private val errorRenderer: ErrorRenderer
 ) : HttpHandler {
 
-    override fun invoke(request: Request): Response {
+    override suspend fun invoke(request: Request): Response {
         val accessTokenRequest = request.accessTokenRequest()
         val accessTokenResult = generateAccessToken(accessTokenRequest)
 

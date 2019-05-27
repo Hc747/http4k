@@ -81,7 +81,7 @@ data class ContractRoutingHttpHandler(private val renderer: ContractRenderer,
 
 internal class PreFlightExtractionFilter(meta: RouteMeta, preFlightExtraction: PreFlightExtraction) : Filter {
     private val preFlightChecks = (meta.preFlightExtraction ?: preFlightExtraction)(meta).toTypedArray()
-    override fun invoke(next: HttpHandler): HttpHandler = {
+    override suspend fun invoke(next: HttpHandler) = HttpHandler {
         val failures = Validator.Strict(it, *preFlightChecks)
         if (failures.isEmpty()) next(it) else throw LensFailure(failures, target = it)
     }

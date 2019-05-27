@@ -7,9 +7,9 @@ import com.natpryce.hamkrest.isA
 import com.natpryce.hamkrest.present
 import kotlinx.coroutines.runBlocking
 import org.http4k.core.Body
+import org.http4k.core.HttpHandler
 import org.http4k.core.MemoryRequest
 import org.http4k.core.MemoryResponse
-import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Method.PUT
@@ -184,7 +184,7 @@ class ClientFiltersTest {
     }
 
     @Test
-    fun `clean proxy cleans request and response by reconstructing it on the way in and out`() {
+    fun `clean proxy cleans request and response by reconstructing it on the way in and out`() = runBlocking {
 
         val captured = AtomicReference<Request>()
 

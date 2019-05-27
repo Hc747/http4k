@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 class BasicAuthenticationTest {
 
     @Test
-    fun wrong_token_type() {
+    fun wrong_token_type() = runBlocking {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
         val response = handler(Request(GET, "/")
             .header("Authorization", "Bearer: foobar"))
@@ -40,7 +40,7 @@ class BasicAuthenticationTest {
     }
 
     @Test
-    fun fails_to_authenticate_with_non_basic_token() {
+    fun fails_to_authenticate_with_non_basic_token() = runBlocking {
         val handler = ServerFilters.BasicAuth("my realm", "user", "password").then { Response(OK) }
         val response = ClientFilters.BearerAuth("token").then(handler)(Request(GET, "/"))
         assertThat(response.status, equalTo(UNAUTHORIZED))

@@ -4,7 +4,7 @@ import org.apache.http.impl.nio.client.HttpAsyncClients
 import org.apache.http.impl.nio.reactor.IOReactorConfig
 import org.http4k.core.BodyMode.Stream
 import org.http4k.server.SunHttp
-import org.junit.Ignore
+import org.junit.jupiter.api.Disabled
 
 class ApacheClientStreamingTest : HttpClientContract({ SunHttp(it) },
     ApacheClient(requestBodyMode = Stream, responseBodyMode = Stream),
@@ -16,7 +16,7 @@ class ApacheClientStreamingTest : HttpClientContract({ SunHttp(it) },
         responseBodyMode = Stream,
         requestBodyMode = Stream)
 ){
-    @Ignore
+    @Disabled
     override fun `requests have expected headers`() {
         super.`requests have expected headers`()
     }

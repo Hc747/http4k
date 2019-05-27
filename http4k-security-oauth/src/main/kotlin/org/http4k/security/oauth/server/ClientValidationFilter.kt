@@ -11,8 +11,8 @@ class ClientValidationFilter(private val clientValidator: ClientValidator,
                              private val errorRenderer: ErrorRenderer,
                              private val extractor: AuthRequestExtractor) : Filter {
 
-    override fun invoke(next: HttpHandler): HttpHandler =
-        {
+    override suspend fun invoke(next: HttpHandler) =
+        HttpHandler {
             if (!validResponseTypes.contains(it.query("response_type"))) {
                 errorRenderer.response(UnsupportedResponseType(it.query("response_type").orEmpty()))
             } else {

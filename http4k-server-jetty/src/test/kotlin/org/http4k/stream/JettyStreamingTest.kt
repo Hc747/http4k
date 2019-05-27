@@ -6,7 +6,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.server.Jetty
 import org.http4k.server.ServerConfig
 import org.http4k.streaming.StreamingContract
-import org.junit.Ignore
+import org.junit.jupiter.api.Disabled
 
 class JettyStreamingTest : StreamingContract() {
     override fun serverConfig(): ServerConfig = Jetty(0)
@@ -14,7 +14,7 @@ class JettyStreamingTest : StreamingContract() {
     override fun createClient(): HttpHandler =
             ApacheClient(requestBodyMode = Stream, responseBodyMode = Stream)
 
-    @Ignore("New ApacheClient is missing streaming support")
+    @Disabled("New ApacheClient is missing streaming support")
     override fun `can stream response`() {
     }
 }

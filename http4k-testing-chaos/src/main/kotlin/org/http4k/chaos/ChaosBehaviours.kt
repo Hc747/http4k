@@ -122,7 +122,7 @@ object ChaosBehaviours {
      */
     object SnipRequestBody {
         operator fun invoke(random: Random = Random, limitFn: (Long) -> Long) = object : Behaviour {
-            override fun invoke(next: HttpHandler): HttpHandler = {
+            override suspend fun invoke(next: HttpHandler) = HttpHandler {
                 next(with(it) {
                     val max = limitFn(body.length ?: 0)
                     val limit = if (max == 0L) 0L else random.nextLong(max)

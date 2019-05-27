@@ -3,15 +3,12 @@ package org.http4k.chaos
 import com.natpryce.hamkrest.and
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
-
-<<<<<<< HEAD
-import org.http4k.chaos.ChaosBehaviours.ReturnStatus
-import com.natpryce.hamkrest.assertion.assertThat
 import kotlinx.coroutines.runBlocking
 import org.http4k.chaos.ChaosStages.Wait
 import org.http4k.chaos.ChaosTriggers.Always
 import org.http4k.contract.security.ApiKeySecurity
 import org.http4k.contract.security.NoSecurity
+import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
@@ -73,9 +70,9 @@ class ChaosEngineTest {
         val app = routes("/" bind GET to { Response(OK) })
 
         val appWithChaos = app.withChaosEngine(
-                Wait,
+            Wait,
             ApiKeySecurity(Header.required("secret"), { true }),
-                "/context"
+            "/context"
         )
 
         assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(UNAUTHORIZED))
@@ -87,9 +84,9 @@ class ChaosEngineTest {
         val app = routes("/{bib}/{bar}" bind GET to { Response(I_M_A_TEAPOT).body(it.path("bib")!! + it.path("bar")!!) })
 
         val appWithChaos = app.withChaosEngine(
-                Wait,
+            Wait,
             NoSecurity,
-                "/context"
+            "/context"
         )
 
         assertThat(appWithChaos(Request(GET, "/context/status")), hasStatus(OK))
@@ -100,8 +97,8 @@ class ChaosEngineTest {
     }
 
     @Test
-    fun `combines with a standard handler route blocks`() {
-        val app = { _: Request -> Response(I_M_A_TEAPOT) }
+    fun `combines with a standard handler route blocks`() = runBlocking {
+        val app = HttpHandler { _: Request -> Response(I_M_A_TEAPOT) }
 
         val appWithChaos = app.withChaosEngine(
             Wait,

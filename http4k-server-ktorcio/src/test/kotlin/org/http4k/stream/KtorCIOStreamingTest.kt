@@ -5,9 +5,9 @@ import org.http4k.core.BodyMode.Stream
 import org.http4k.server.KtorCIO
 import org.http4k.streaming.StreamingContract
 import org.http4k.streaming.StreamingTestConfiguration
-import org.junit.Ignore
 import org.junit.jupiter.api.BeforeEach
-import java.util.*
+import org.junit.jupiter.api.Disabled
+import java.util.Random
 
 class KtorCIOStreamingTest : StreamingContract(
     StreamingTestConfiguration(multiplier = 4)
@@ -21,7 +21,7 @@ class KtorCIOStreamingTest : StreamingContract(
 
     override fun createClient() = ApacheClient(requestBodyMode = Stream, responseBodyMode = Stream)
 
-    @Ignore("New ApacheClient is missing streaming support")
+    @Disabled("New ApacheClient is missing streaming support")
     override fun `can stream response`() {
     }
 }

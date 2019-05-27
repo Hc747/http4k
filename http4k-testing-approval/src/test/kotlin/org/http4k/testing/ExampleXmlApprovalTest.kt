@@ -2,6 +2,7 @@ package org.http4k.testing
 
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.throws
+import kotlinx.coroutines.runBlocking
 import org.http4k.core.ContentType.Companion.APPLICATION_XML
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
@@ -16,26 +17,26 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(XmlApprovalTest::class)
 class ExampleXmlApprovalTest {
 
-    private val app: HttpHandler = {
+    private val app = HttpHandler {
         Response(OK)
             .with(CONTENT_TYPE of APPLICATION_XML)
             .body("""<?xml version="1.0" encoding="UTF-8"?><UriContainer><field>foo.bar</field></UriContainer>""")
     }
 
     @Test
-    fun `check response content`(approver: Approver) {
+    fun `check response content`(approver: Approver) = runBlocking {
         approver.assertApproved(app(Request(GET, "/url")))
     }
 
     @Test
-    fun `check response content with mismatching content type`(approver: Approver) {
+    fun `check response content with mismatching content type`(approver: Approver) = runBlocking {
         assertThat({
             approver.assertApproved(Response(OK))
         }, throws<AssertionError>())
     }
 
     @Test
-    fun `check response content with badly-formatted XML`(approver: Approver) {
+    fun `check response content with badly-formatted XML`(approver: Approver) = runBlocking {
         assertThat({
             approver.assertApproved(
                 Response(OK).with(CONTENT_TYPE of APPLICATION_XML).body("""<this is not really XML""")
